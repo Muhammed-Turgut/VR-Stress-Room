@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "592329226969",
+    "project_id": "vr-stress-room-project-ce882",
+    "storage_bucket": "vr-stress-room-project-ce882.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:592329226969:android:09fbb6d279b904827c9cc8",
+        "android_client_info": {
+          "package_name": "com.VrStressRoom.vrstressroom"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4LMujjK0w_ecIjkC_09NBUXTqC0x75Xc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

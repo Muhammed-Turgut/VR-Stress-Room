@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,7 +78,11 @@ fun ChatBotScreenPage(viewModel: ChatViewModel= viewModel(), navController: NavC
                     .background(Color.White), // Alt kısım boş kalır (input için)
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Row(modifier = Modifier.fillMaxWidth().padding(top = 64.dp, start = 16.dp, end = 16.dp)){
+                Row(modifier = Modifier
+
+                    .fillMaxWidth()
+                    .padding(top = 64.dp, start = 16.dp, end = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically){
 
 
                     IconButton(
@@ -154,7 +159,7 @@ fun MessageInput(onMessageSend: (String) -> Unit,saveItem : (ItemChatBotList) ->
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
@@ -172,7 +177,19 @@ fun MessageInput(onMessageSend: (String) -> Unit,saveItem : (ItemChatBotList) ->
             modifier = Modifier
                 .background(Color(0xFFFFDDEF))
                 .weight(1f)
-                .clip(RoundedCornerShape(4.dp))
+                .clip(RoundedCornerShape(4.dp)),
+
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color.Black,
+                unfocusedTextColor = Color(0xFFB7B7B7),
+                cursorColor = Color.White,
+                focusedBorderColor = Color(0xFF9F009B),
+                unfocusedBorderColor = Color(0xFF9F009B),
+                focusedLeadingIconColor = Color.Black,
+                unfocusedLeadingIconColor = Color(0xFFB7B7B7),
+                focusedLabelColor = Color.White,
+                unfocusedLabelColor = Color(0xFFB7B7B7)
+            )
         )
 
         IconButton(
@@ -184,9 +201,9 @@ fun MessageInput(onMessageSend: (String) -> Unit,saveItem : (ItemChatBotList) ->
             modifier = Modifier.align(Alignment.Top)
         ) {
             Image(
-                painter = painterResource(R.drawable.messegesendicon),
+                painter = painterResource(R.drawable.chatbotsendicon),
                 contentDescription = "Gönder",
-                modifier = Modifier.size(50.dp)
+                modifier = Modifier.size(width = 32.dp, height = 27.dp)
             )
         }
     }
@@ -197,8 +214,8 @@ fun MessageInput(onMessageSend: (String) -> Unit,saveItem : (ItemChatBotList) ->
 @Composable
 fun MessageBubble(sender: String, text: String, dateTime: String) {
     val isUser = sender == "isUser"
-    val bubbleColor = if (isUser) Color(0xFFFFDDEF) else Color(0xFF9F009B)
-    val textColor = if (isUser) Color.Black else Color.White
+    val bubbleColor = if (isUser) Color(0xFF9F009B) else Color(0xFFFFDDEF)
+    val textColor = if (isUser) Color.White else  Color.Black
     val rowAlignment = if (isUser) Arrangement.End else Arrangement.Start
 
     Row(

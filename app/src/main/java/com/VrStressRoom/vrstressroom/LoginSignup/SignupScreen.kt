@@ -46,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.VrStressRoom.vrstressroom.R
 
 @Composable
@@ -81,14 +82,7 @@ fun SignupScreen(modifier: Modifier=Modifier, navController: NavController, auth
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFB3005E),
-                        Color(0xFF060047)
-                    )
-                )
-            )
+            .background(Color(0xFF060047))
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -110,19 +104,53 @@ fun SignupScreen(modifier: Modifier=Modifier, navController: NavController, auth
                         ),
                         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
-                    .border(
-                        width = 0.3.dp,
-                        color = Color(0xFFFFFFFF), // Neon Yeşil Renk
-                        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
-                    )
+
             ) {
                 Text(
                     "Kayıt Ol",
                     color = Color.White,
                     fontSize = 32.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 32.dp)
+                    modifier = Modifier.padding(top = 18.dp)
                 )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = {},
+                        shape = RectangleShape,
+                        modifier = Modifier
+                            .padding(end = 4.dp) // Sağ tarafa 4.dp boşluk
+                            .size(126.dp, 40.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                       // Köşeleri yuvarlatılmış
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = Color.Black
+                        )
+                    ) {
+                        Text(text = "Kullanıcı")
+                    }
+
+                    Button(
+                        shape = RectangleShape,
+                        onClick = {},
+                        modifier = Modifier
+                            .padding(start = 4.dp) // Sol tarafa 4.dp boşluk
+                            .size(126.dp, 40.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                       // Köşeleri yuvarlatılmış
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = Color.Black
+                        )
+                    ) {
+                        Text(text = "Psikolog")
+                    }
+                }
 
               /*  Image(
                     painter = painterResource(R.drawable.googlelogoicon),
@@ -137,6 +165,7 @@ fun SignupScreen(modifier: Modifier=Modifier, navController: NavController, auth
                     modifier = Modifier.padding(top = 6.dp),
                     fontSize = 13.sp
                 )*/
+
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -144,7 +173,7 @@ fun SignupScreen(modifier: Modifier=Modifier, navController: NavController, auth
                     value = name,
                     onValueChange = { name = it },
                     label = {
-                        Text("Adınız", color = Color.White)
+                        Text("Adınız", color = Color.White, fontSize = 16.sp)
                     }, colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
                         unfocusedTextColor = Color(0xFFB7B7B7),
@@ -186,7 +215,7 @@ fun SignupScreen(modifier: Modifier=Modifier, navController: NavController, auth
                     value = username,
                     onValueChange = { username = it },
                     label = {
-                        Text("Kullanıcı adınız", color = Color.White)
+                        Text("Kullanıcı adınız", color = Color.White, fontSize = 16.sp)
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
@@ -207,7 +236,7 @@ fun SignupScreen(modifier: Modifier=Modifier, navController: NavController, auth
                     value = email,
                     onValueChange = { email = it },
                     label = {
-                        Text("E-mail", color = Color.White)
+                        Text("E-mail", color = Color.White, fontSize = 16.sp)
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
@@ -227,7 +256,7 @@ fun SignupScreen(modifier: Modifier=Modifier, navController: NavController, auth
                     onValueChange = {
                         password = it },
                     label = {
-                        Text("şifreniz", color = Color.White)
+                        Text("şifreniz", color = Color.White, fontSize = 16.sp)
                     },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White,
@@ -301,5 +330,11 @@ fun SignupScreen(modifier: Modifier=Modifier, navController: NavController, auth
             }
         }
     }
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun displaySignup(){
 
 }

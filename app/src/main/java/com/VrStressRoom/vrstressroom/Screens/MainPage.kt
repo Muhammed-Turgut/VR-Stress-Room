@@ -1,8 +1,7 @@
 package com.VrStressRoom.vrstressroom.Screens
 
-import android.content.Context
+
 import androidx.activity.compose.BackHandler
-import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,16 +31,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.VrStressRoom.vrstressroom.CameraTestScreen.CameraScreen
-import com.VrStressRoom.vrstressroom.CameraTestScreen.CameraScreenPage
-
-import com.VrStressRoom.vrstressroom.CameraTestScreen.CameraViewModel
 import com.VrStressRoom.vrstressroom.LoginSignup.AuthViewModel
 import com.VrStressRoom.vrstressroom.R
+import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.StresTestScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
-fun MainPage(modifier: Modifier = Modifier, navControllerer: NavController, authViewModel: AuthViewModel){
+fun MainPage(modifier: Modifier = Modifier, bottomNavControllerer: NavController, authViewModel: AuthViewModel){
     BackHandler {
         // Boş bırak -> hiçbir şey yapmaz geri tuşuna basıldığında geri gelmez.
         //Bu kısmı telefonun geri tuşundan etkilenmez.
@@ -64,7 +60,7 @@ fun MainPage(modifier: Modifier = Modifier, navControllerer: NavController, auth
 
             composable ("StressTest"){
 
-                StresTestScreen()
+                StresTestScreen(bottomNavControllerer)
 
             }
 
@@ -73,7 +69,7 @@ fun MainPage(modifier: Modifier = Modifier, navControllerer: NavController, auth
             }
 
             composable ("ChatBot"){
-                navControllerer.navigate("AıChatBot")
+                bottomNavControllerer.navigate("AıChatBot")
             }
 
             composable ("Profil"){

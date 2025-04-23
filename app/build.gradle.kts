@@ -96,6 +96,9 @@ dependencies {
     implementation ("androidx.navigation:navigation-compose:2.8.7-alpha10")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.1-alpha")
 
+    //Bu Lottie files kütüphanesi.
+    implementation("com.airbnb.android:lottie-compose:6.0.0")
+
     val room_version = "2.7.0"
     ksp("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-runtime:$room_version")

@@ -1,32 +1,52 @@
 // CameraScreen.kt
 package com.VrStressRoom.vrstressroom.CameraTestScreen
 
-import android.app.Activity
+
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.VrStressRoom.vrstressroom.CameraTestScreen.CameraViewModel.Companion.CameraX_PERMISSION
-import kotlinx.coroutines.launch
+import com.VrStressRoom.vrstressroom.R
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CameraScreen() {
+fun CameraScreen(navController: NavController) {
     val context = LocalContext.current
     val cameraViewModel: CameraViewModel = viewModel()
     val viewModel: CameraViewModel = viewModel()
@@ -35,6 +55,7 @@ fun CameraScreen() {
     val bitmaps by cameraViewModel.bitmaps.collectAsState()
 
     println("bot yanıtı: ${botYaniti}")
+
     // Permission launcher
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -46,7 +67,6 @@ fun CameraScreen() {
     }
 
 
-
     // Check and request permissions
     LaunchedEffect(Unit) {
         if (!cameraViewModel.hasRequiredPermission(context)) {
@@ -54,12 +74,16 @@ fun CameraScreen() {
         }
     }
 
-    CameraScreenPage(
-        controller = controller,
-        context = context,
-        viewModel = cameraViewModel,
-        bitmaps = bitmaps
-    )
+    Box(modifier = Modifier.fillMaxSize()){
+
+        CameraScreenPage(
+            controller = controller,
+            context = context,
+            viewModel = cameraViewModel,
+            bitmaps = bitmaps
+        )
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,83 +96,178 @@ fun CameraScreenPage(
 ) {
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberBottomSheetScaffoldState()
+    val botResponse by viewModel.aiResponse.collectAsState()
+    val lastCapturedBitmap by viewModel.lastCapturedBitmap.collectAsState()
 
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 0.dp,
-        sheetContent = {
-            PhotoBottomSheetContent(
-                bitmaps = bitmaps,
-                modifier = Modifier.fillMaxWidth()
+    val cabinBold = FontFamily(
+        Font(R.font.cabinbold, FontWeight.Bold)
+    )
+
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFB3005E),
+                        Color(0xFF0A007A),
+                        Color(0xFFB3005E)
+                    )
+                )
             )
-        }
-    ) { padding ->
+            .padding(start = 8.dp, end = 8.dp, top = 110.dp, bottom = 50.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Text(text = "Yüzünüzün Analizi Yapılıyor,${botResponse}",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White,
+            fontFamily = cabinBold,
+            modifier = Modifier.padding(bottom = 10.dp))
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
         ) {
-            CameraPreview(
-                controller = controller,
-                modifier = Modifier.fillMaxSize()
-            )
+            if (lastCapturedBitmap != null) {
+                // Görüntü gösteriliyor
+                Box {
+
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Kapat",
+                            tint = Color.White,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(8.dp)
+                                .size(24.dp)
+                                .clickable {
+                                    viewModel.clearLastCapturedBitmap()
+                                }
+                        )
+                        Image(
+                            bitmap = lastCapturedBitmap!!.asImageBitmap(),
+                            contentDescription = "Çekilen Fotoğraf",
+                            modifier = Modifier
+                                .height(600.dp)
+                                .width(380.dp)
+                        )
 
 
+                }
 
-            // Toggle camera button
-            IconButton(
-                onClick = {
-                    controller.cameraSelector = if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) {
-                        CameraSelector.DEFAULT_FRONT_CAMERA
-                    } else {
-                        CameraSelector.DEFAULT_BACK_CAMERA
-                    }
-                },
-                modifier = Modifier.offset(16.dp, 16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Phone,
-                    contentDescription = "Switch Camera"
+            } else {
+                // Kamera aktif
+                CameraPreview(
+                    controller = controller,
+                    modifier = Modifier
+                        .height(600.dp)
+                        .width(380.dp)
                 )
             }
 
-            // Bottom controls
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-                // Gallery button
-                IconButton(
-                    onClick = {
-                        scope.launch {
-                            scaffoldState.bottomSheetState.expand()
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AccountBox,
-                        contentDescription = "Open Gallery"
-                    )
-                }
+        }
 
-                // Capture button
-                IconButton(
-                    onClick = {
-                        viewModel.takePhoto(
-                            controller = controller,
-                            context = context
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 20.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Sağdaki Kamera Değiştir Butonu
+                Box(
+                    modifier = Modifier
+                        .weight(1f),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(45.dp)
+                            .clickable {
+                                controller.cameraSelector =
+                                    if (controller.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA)
+                                        CameraSelector.DEFAULT_FRONT_CAMERA
+                                    else
+                                        CameraSelector.DEFAULT_BACK_CAMERA
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.camerarotate),
+                            contentDescription = "Kamera Değiştir",
+                            modifier = Modifier.fillMaxSize()
                         )
                     }
+                }
+
+                // Ortadaki Fotoğraf Çek Butonu
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .align(Alignment.CenterVertically)
+                        .clickable {
+                            viewModel.takePhoto(controller = controller, context = context)
+                        },
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = "Take Photo"
+                    Image(
+                        painter = painterResource(R.drawable.takepohotobutton),
+                        contentDescription = "Fotoğraf Çek",
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
+                val bitmap=lastCapturedBitmap //burda mantıken tür dönüşümü yaptık.
+                // Soldaki Check Icon (Varsa)
+                if (bitmap != null) {
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(45.dp)
+                                .clickable {
+                                  viewModel.onTakePhoto(bitmap)
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.checkicon),
+                                contentDescription = "Devam Et",
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
+                } else {
+                    Spacer(modifier = Modifier.weight(1f)) // Yer tutucu
+                }
+
+
             }
         }
+
+
+
+
     }
 }
+
+
+
+
+@Preview(showBackground = true)
+@Composable
+fun displayCamera(){
+
+
+}
+
+

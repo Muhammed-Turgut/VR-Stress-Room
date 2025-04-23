@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -38,6 +39,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,13 +62,17 @@ fun LoginScreen(modifier: Modifier = Modifier,
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var selectedLoginOption by remember { mutableStateOf(true) }
 
     val authState =authViewModel.authState.observeAsState()
     val context = LocalContext.current
+    val cabinFontFamily = FontFamily(
+        Font(R.font.cabinbold, FontWeight.Bold)
+    )
 
     LaunchedEffect(authState.value) {
         when(authState.value){
-            is AuthState.Authenticated -> navController.navigate("HomeScreen")
+            is AuthState.Authenticated -> navController.navigate("MainPage")
             is AuthState.Error -> Toast.makeText(context,
                 (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
 
@@ -76,14 +83,7 @@ fun LoginScreen(modifier: Modifier = Modifier,
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFB3005E),
-                        Color(0xFF060047)
-                    )
-                )
-            )
+            .background(Color(0xFF060047))
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -91,7 +91,7 @@ fun LoginScreen(modifier: Modifier = Modifier,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                modifier = Modifier.padding(top = 48.dp),
+                modifier = Modifier.padding(top = 64.dp),
                 textAlign = TextAlign.Center,
                 text = "VR Stres\nOdası",
                 color = Color.White,
@@ -103,7 +103,7 @@ fun LoginScreen(modifier: Modifier = Modifier,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 60.dp, start = 16.dp, end = 16.dp)
+                    .padding(top = 24.dp, start = 16.dp, end = 16.dp)
                     .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     .background(
                         brush = Brush.verticalGradient(
@@ -115,15 +115,70 @@ fun LoginScreen(modifier: Modifier = Modifier,
                         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
             ) {
+
+
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp, top = 16.dp, end = 16.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = {
+                            selectedLoginOption = !selectedLoginOption
+                        },
+                        shape = RectangleShape,
+                        modifier = Modifier
+                            .padding(end = 4.dp) // Sağ tarafa 4.dp boşluk
+                            .size(126.dp, 40.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        // Köşeleri yuvarlatılmış
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if(selectedLoginOption) Color.White else Color.Transparent,
+                            contentColor = Color.Black
+                        )
+                    ) {
+                        Text(text = "Kullanıcı", color = if(selectedLoginOption) Color.Black else Color.White)
+                    }
+
+                    Button(
+                        shape = RectangleShape,
+                        onClick = {
+                            selectedLoginOption = !selectedLoginOption
+                        },
+                        modifier = Modifier
+                            .padding(start = 4.dp) // Sol tarafa 4.dp boşluk
+                            .size(126.dp, 40.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        // Köşeleri yuvarlatılmış
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if(selectedLoginOption) Color.Transparent else Color.White,
+                            contentColor = Color.Black
+                        )
+                    ) {
+                        Text(text = "Psikolog", color = if(selectedLoginOption) Color.White else Color.Black)
+                    }
+                }
+
+
+                Image(
+                    painter = painterResource(R.drawable.loginicon),
+                    contentDescription = null,
+                    modifier = Modifier.padding(top=32.dp).size(32.dp))
                 Text(
                     "Giriş Yap",
                     color = Color.White,
                     fontSize = 32.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(top = 32.dp)
+                    fontFamily = cabinFontFamily,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                Text(text="Hesabınıza giriş yapın",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.White,
+                    modifier = Modifier.padding(top = 12.dp)
                 )
 
-                Image(
+                /*Image(
                     painter = painterResource(R.drawable.googlelogoicon),
                     contentDescription = null,
                     modifier = Modifier
@@ -135,7 +190,8 @@ fun LoginScreen(modifier: Modifier = Modifier,
                     color = Color.White,
                     modifier = Modifier.padding(top = 8.dp),
                     fontSize = 13.sp
-                )
+                )*/
+
 
                 OutlinedTextField(
                     modifier = Modifier
@@ -199,13 +255,6 @@ fun LoginScreen(modifier: Modifier = Modifier,
                 Button(
                             onClick = {
                                 authViewModel.login(email,password)
-                                when(authState.value){
-                                    is AuthState.Authenticated -> navController.navigate("MainPage")
-                                    is AuthState.Error -> Toast.makeText(context,
-                                       "Lütfen gerekli alanları doldurun", Toast.LENGTH_SHORT).show()
-
-                                    else -> Unit
-                                }
                             },
                             shape = RectangleShape,
                             modifier = Modifier.padding(start = 32.dp, top = 24.dp, end = 32.dp).clip(RoundedCornerShape(4.dp)).fillMaxWidth(),// <-- Tüm köşeleri düz yapar

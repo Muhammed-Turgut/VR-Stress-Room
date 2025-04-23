@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.VrStressRoom.vrstressroom.CameraTestScreen.PhotoAISend.CameraBotRetrofitInstances
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -31,9 +32,19 @@ class CameraViewModel : ViewModel() {
     private val _aiResponse = MutableStateFlow<String?>(null)
     val aiResponse = _aiResponse.asStateFlow()
 
+    private val _lastCapturedBitmap = MutableStateFlow<Bitmap?>(null)
+    val lastCapturedBitmap: StateFlow<Bitmap?> = _lastCapturedBitmap
+
+
     fun onTakePhoto(bitmap: Bitmap) {
         _bitmaps.value += bitmap
+        _lastCapturedBitmap.value = bitmap
         sendImageToServer(bitmap)
+    }
+
+    //Son çekilen fotoğrafın alanını temizler.
+    fun clearLastCapturedBitmap() {
+        _lastCapturedBitmap.value = null
     }
 
     fun takePhoto(
@@ -70,7 +81,7 @@ class CameraViewModel : ViewModel() {
         )
     }
 
-    private fun sendImageToServer(bitmap: Bitmap) {
+     fun sendImageToServer(bitmap: Bitmap) {
         viewModelScope.launch {
             val file = bitmapToFile(bitmap) ?: return@launch
 

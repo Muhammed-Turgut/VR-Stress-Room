@@ -3,10 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.kotlin.serialization)
     id("com.google.devtools.ksp")
-
-
-
 }
 
 android {
@@ -87,6 +85,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 
+    //Coroin lifescope
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+
     // MVVM mimarisi için
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
@@ -123,6 +124,15 @@ dependencies {
 
     //Bu sayafalar arasındaki geçişler için kullnadım.
     implementation ("com.google.accompanist:accompanist-pager:0.28.0")
+
+    //Bu kod görntülü görüşme için eklendi
+    implementation(libs.bundles.koin)
+    implementation(libs.bundles.stream)
+
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+
+
 }
 
 configurations.all {

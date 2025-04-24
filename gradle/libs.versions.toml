@@ -14,6 +14,10 @@ navigationComposeJvmstubs = "2.9.0-beta01"
 googleGmsGoogleServices = "4.4.2"
 firebaseAuth = "23.2.0"
 runtimeLivedata = "1.7.8"
+stream = "0.5.8"
+koin = "3.5.3"
+composeNavigation = "2.8.0-beta01"
+serialization = "1.6.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,10 +39,22 @@ androidx-runtime-android = { group = "androidx.compose.runtime", name = "runtime
 androidx-navigation-compose-jvmstubs = { group = "androidx.navigation", name = "navigation-compose-jvmstubs", version.ref = "navigationComposeJvmstubs" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+stream-video = { module = "io.getstream:stream-video-android-core", version.ref = "stream" }
+stream-video-android-ui-compose = { module = "io.getstream:stream-video-android-ui-compose", version.ref = "stream" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
+[bundles]
+koin = ["koin-core", "koin-android", "koin-androidx-compose"]
+stream = ["stream-video", "stream-video-android-ui-compose"]

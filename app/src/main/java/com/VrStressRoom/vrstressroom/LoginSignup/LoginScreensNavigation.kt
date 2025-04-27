@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.VrStressRoom.vrstressroom.Activity.ConnectivityViewModel
 import com.VrStressRoom.vrstressroom.CameraTestScreen.CameraScreen
 import com.VrStressRoom.vrstressroom.CameraTestScreen.CameraViewModel
 import com.VrStressRoom.vrstressroom.Network.ChatBotRoomDatabase.ItemChatBotList
@@ -14,11 +15,16 @@ import com.VrStressRoom.vrstressroom.Screens.SplashScreenMain
 import com.VrStressRoom.vrstressroom.Network.ChatBotScreenPage
 import com.VrStressRoom.vrstressroom.Network.ChatViewModel
 import com.VrStressRoom.vrstressroom.Screens.MainPage
+import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.AIQuizStartScreen
+import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.AiQuizScreen
 import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.StresTestStartScreen
+import com.VrStressRoom.vrstressroom.VideoCalling.VideoScreenPage
 
 
 @Composable
-fun LoginScreenNavigation(modifier: Modifier=Modifier, authViewModel: AuthViewModel){
+fun LoginScreenNavigation(modifier: Modifier=Modifier, authViewModel: AuthViewModel,
+                          context: Context,
+                          cameraViewModel: CameraViewModel){
     val navController = rememberNavController()
 
 
@@ -40,19 +46,23 @@ fun LoginScreenNavigation(modifier: Modifier=Modifier, authViewModel: AuthViewMo
             StresTestStartScreen(navController)
         }
 
+        composable("VideoScreenPage") {
+             VideoScreenPage()
+        }
+
         composable("Signup"){
             SignupScreen(modifier,navController,authViewModel)
         }
         composable("CameraScreen"){
            CameraScreen(navController)
         }
-
+        composable("AiQuizScreen"){
+            AiQuizScreen(navController,context, cameraViewModel = cameraViewModel)
+        }
 
         composable("AıChatBot"){
             ChatBotScreenPage(navController=navController)
         }
-
-
 
     })
 }

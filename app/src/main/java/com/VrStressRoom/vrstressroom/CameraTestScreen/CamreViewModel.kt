@@ -9,10 +9,14 @@ import androidx.camera.core.ImageCapture.OnImageCapturedCallback
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.view.LifecycleCameraController
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.VrStressRoom.vrstressroom.CameraTestScreen.PhotoAISend.CameraBotRetrofitInstances
+import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.Test
+import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.kidsTest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,6 +35,9 @@ class CameraViewModel : ViewModel() {
 
     private val _aiResponse = MutableStateFlow<String?>(null)
     val aiResponse = _aiResponse.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)  // Loading durumu
+    val isLoading = _isLoading.asStateFlow()
 
     private val _lastCapturedBitmap = MutableStateFlow<Bitmap?>(null)
     val lastCapturedBitmap: StateFlow<Bitmap?> = _lastCapturedBitmap
@@ -81,7 +88,7 @@ class CameraViewModel : ViewModel() {
         )
     }
 
-     fun sendImageToServer(bitmap: Bitmap) {
+    fun sendImageToServer(bitmap: Bitmap) {
         viewModelScope.launch {
             val file = bitmapToFile(bitmap) ?: return@launch
 
@@ -102,6 +109,16 @@ class CameraViewModel : ViewModel() {
             }
         }
     }
+
+     //Shared Preferance kayıt yapan kod.
+     fun saveResponseToPreferences(context: Context, response: String) {
+        val sharedPref = context.getSharedPreferences("AI_PREFS", Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putString("last_ai_response", response)
+            apply()
+        }
+    }
+
 
     private fun bitmapToFile(bitmap: Bitmap): File? {
         return try {
@@ -130,3 +147,4 @@ class CameraViewModel : ViewModel() {
         )
     }
 }
+

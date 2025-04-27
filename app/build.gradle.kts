@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.runtime.android)
     implementation(libs.firebase.auth)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.firebase.firestore)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -131,6 +132,8 @@ dependencies {
 
     implementation(libs.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
+
+
 
 
 }

@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.VrStressRoom.vrstressroom.R
 import kotlinx.coroutines.delay
 
@@ -63,14 +64,16 @@ fun StresTestScreen(navController: NavController){
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         fontFamily = cabinBold,
-                        lineHeight = 24.sp
+                        lineHeight = 24.sp,
+                        color = Color.Black
                     )
 
                     Text(modifier = Modifier.padding(top = 8.dp), text = "Stres seviyeniz iyi \n" +
                             "durumda",
                         fontWeight =FontWeight.Normal,
                         fontFamily = cabinRegular,
-                        fontSize = 20.sp)
+                        fontSize = 20.sp,
+                        color = Color.Black)
                 }
                 Spacer(modifier = Modifier.width(16.dp))
 
@@ -145,23 +148,23 @@ fun StressLevelIndicator(
             Text(
                 text = "$stressLevel%",
                 fontSize = 32.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,color = Color.Black
+
             )
             Text(
                 text = "12.04.2025",
                 fontSize = 10.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
             )
         }
     }
 }
 
 
-
-
-
 @Preview(showBackground = true)
 @Composable
 fun displayStresTestApp(){
-
+    val navController = rememberNavController()
+    StresTestScreen(navController = navController)
 }

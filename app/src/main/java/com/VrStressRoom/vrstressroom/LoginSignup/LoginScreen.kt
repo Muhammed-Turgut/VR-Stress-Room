@@ -99,6 +99,7 @@ fun LoginScreen(modifier: Modifier = Modifier,
                 fontSize = 40.sp,
                 lineHeight = 48.sp
             )
+
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
@@ -255,6 +256,9 @@ fun LoginScreen(modifier: Modifier = Modifier,
                 Button(
                             onClick = {
                                 authViewModel.login(email,password)
+                                 if(AuthState.Authenticated != null){
+                                     navController.navigate("MainPage")
+                                 }
                             },
                             shape = RectangleShape,
                             modifier = Modifier.padding(start = 32.dp, top = 24.dp, end = 32.dp).clip(RoundedCornerShape(4.dp)).fillMaxWidth(),// <-- Tüm köşeleri düz yapar

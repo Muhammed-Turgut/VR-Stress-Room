@@ -20,6 +20,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -298,7 +299,7 @@ fun SignupScreen(modifier: Modifier=Modifier, navController: NavController, auth
 
                 Button(
                     onClick = {
-                        authViewModel.signup(email,password)
+                        authViewModel.signup(name = name, lastname = lastname, username = username, email = email, password = password)
                         when(authState.value){
                             is AuthState.Authenticated -> navController.navigate("MainPage")
                             is AuthState.Error -> Toast.makeText(context,
@@ -326,6 +327,25 @@ fun SignupScreen(modifier: Modifier=Modifier, navController: NavController, auth
                     navController.navigate("Login")
                 }, modifier = Modifier.padding(top = 16.dp)) {
                     Text("Bir hesabın var mı? Giriş yap", modifier = Modifier, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+                }
+            }
+        }
+
+        if (authState.value is AuthState.Loading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0x99000000)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(color = Color.White)
+                    Text(
+                        text = "Kayıt olunuyor...",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(top = 16.dp)
+                    )
                 }
             }
         }

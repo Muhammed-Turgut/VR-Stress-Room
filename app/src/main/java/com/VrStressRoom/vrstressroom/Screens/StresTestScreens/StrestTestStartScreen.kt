@@ -1,5 +1,6 @@
 package com.VrStressRoom.vrstressroom.Screens.StresTestScreens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,10 @@ fun StresTestStartScreen(navController: NavController) {
     val cabinSemiBold = FontFamily(
         Font(R.font.cabinsemibold, FontWeight.SemiBold)
     )
+
+    BackHandler {
+        // Geri tuşuna basıldığında hiçbir şey yapma
+    }
 
     LaunchedEffect(Unit) {
         delay(3000L) // 3000 milisaniye = 3 saniye

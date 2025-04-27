@@ -37,30 +37,30 @@ import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.StresTestScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
-fun MainPage(modifier: Modifier = Modifier, bottomNavControllerer: NavController, authViewModel: AuthViewModel){
+fun MainPage(modifier: Modifier = Modifier, navController: NavController, authViewModel: AuthViewModel){
     BackHandler {
         // Boş bırak -> hiçbir şey yapmaz geri tuşuna basıldığında geri gelmez.
         //Bu kısmı telefonun geri tuşundan etkilenmez.
     }
 
-    val navController= rememberNavController()
+    val bottomNavController= rememberNavController()
 
     Scaffold(modifier=Modifier.fillMaxSize(),
         bottomBar = {
-            NavigationBottomBar(navController)
+            NavigationBottomBar(bottomNavController)
         }){ paddingValues ->
         NavHost(
-            navController=navController,
+            navController=bottomNavController,
             startDestination = "HomeScreen",
             modifier = Modifier.fillMaxSize().padding(paddingValues))
         {
           composable ("HomeScreen"){
-                 HomeScreen()
+                 HomeScreen(navController=navController, authViewModel = authViewModel)
           }
 
             composable ("StressTest"){
 
-                StresTestScreen(bottomNavControllerer)
+                StresTestScreen(navController)
 
             }
 
@@ -69,11 +69,11 @@ fun MainPage(modifier: Modifier = Modifier, bottomNavControllerer: NavController
             }
 
             composable ("ChatBot"){
-                bottomNavControllerer.navigate("AıChatBot")
+                navController.navigate("AıChatBot")
             }
 
             composable ("Profil"){
-                  ProfilDetailsScreen()
+                  ProfilDetailsScreen(authViewModel,navController)
             }
 
 

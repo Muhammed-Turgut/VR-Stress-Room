@@ -58,10 +58,13 @@ import com.VrStressRoom.vrstressroom.R
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.navigation.NavController
+import com.VrStressRoom.vrstressroom.LoginSignup.AuthViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreen(viewModel: ConnectivityViewModel = viewModel()) {
+fun HomeScreen(viewModel: ConnectivityViewModel = viewModel(),navController: NavController,authViewModel: AuthViewModel) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -80,7 +83,7 @@ fun HomeScreen(viewModel: ConnectivityViewModel = viewModel()) {
                         .fillMaxSize()
                 ) {
                     // Header (Sabit bölüm)
-                    HomeScreenHeader()
+                    HomeScreenHeader(authViewModel)
 
                     // Dikey kaydırılabilir alan
                     CompositionLocalProvider(
@@ -92,8 +95,8 @@ fun HomeScreen(viewModel: ConnectivityViewModel = viewModel()) {
                                 .verticalScroll(rememberScrollState()) // Kaydırma etkisi
                         ) {
                             lastTest()
-                            FindATherapist()
-                            RecommendedTherapist()
+                            FindATherapist(navController)
+                            RecommendedTherapist(authViewModel)
                             commentField()
                         }
                     }
@@ -108,66 +111,78 @@ fun HomeScreen(viewModel: ConnectivityViewModel = viewModel()) {
 }
 
 @Composable
-fun HomeScreenHeader() {
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp, vertical = 12.dp)
-        .clip(RoundedCornerShape(100.dp))
-        .background(
-            brush = Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFFFF5F9E),
-                    Color(0xFFB3005E)
-                )
-            )
-        )){
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, bottom = 8.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-            // Profil Fotoğrafı
-            Image(
-                painter = painterResource(R.drawable.userimage),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(start = 8.dp) // En sola boşluk bırakır
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .border(2.dp, Color.White, CircleShape)
-            )
+fun HomeScreenHeader(authViewModel: AuthViewModel) {
+    val userInfo by authViewModel.userInfo.observeAsState()
 
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp)
-            ) {
-                Text(
-                    text = "Hoş Geldiniz",
-                    fontWeight = FontWeight.SemiBold,
-                    fontStyle = FontStyle.Italic,
-                    fontSize = 14.sp,
-                    color = Color.White,
-                    lineHeight = 4.sp
+    LaunchedEffect(Unit) {
+        authViewModel.getAuthUserInformation()
+    }
+
+    userInfo?.let { user ->
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .clip(RoundedCornerShape(100.dp))
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFFF5F9E),
+                            Color(0xFFB3005E)
+                        )
+                    )
                 )
-                Spacer(modifier = Modifier.height(2.dp)) // Boşluğu azaltmak için 4.dp
-                Text(
-                    text = "Muhammed Turgut",
-                    fontWeight = FontWeight.SemiBold,
-                    fontStyle = FontStyle.Normal,
-                    fontSize = 14.sp,
-                    color = Color.White,
-                    lineHeight = 4.sp //satır yüksekliği
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp, bottom = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Profil Fotoğrafı
+                Image(
+                    painter = painterResource(R.drawable.userimage),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(start = 8.dp) // En sola boşluk bırakır
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, Color.White, CircleShape)
+                )
+
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 8.dp)
+                ) {
+                    Text(
+                        text = "Hoş Geldiniz",
+                        fontWeight = FontWeight.SemiBold,
+                        fontStyle = FontStyle.Italic,
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        lineHeight = 4.sp
+                    )
+                    Spacer(modifier = Modifier.height(2.dp)) // Boşluğu azaltmak için 4.dp
+                    Text(
+                        text = "${user.name} ${user.lastname}",
+                        fontWeight = FontWeight.SemiBold,
+                        fontStyle = FontStyle.Normal,
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        lineHeight = 4.sp //satır yüksekliği
+                    )
+                }
+
+                // Bildirim İkonu
+                Image(
+                    painter = painterResource(R.drawable.belliconbutton),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 12.dp)
+                        .size(48.dp)
                 )
             }
-
-            // Bildirim İkonu
-            Image(
-                painter = painterResource(R.drawable.belliconbutton),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(end = 12.dp)
-                    .size(48.dp)
-            )
         }
     }
 }
@@ -195,7 +210,7 @@ fun lastTest(){
                 Text("Son Stres ölçümü",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
+                    fontSize = 24.sp,
                 )
                 Text("Şuanda nasıl hisediyorsunuz",
                     color = Color.White,
@@ -231,9 +246,8 @@ fun lastTest(){
 
 }
 
-
 @Composable
-fun FindATherapist() {
+fun FindATherapist(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -252,17 +266,21 @@ fun FindATherapist() {
                 Text(
                     text = "Terapist ile Randevu\nAyarla",
                     fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
                 )
                 Text(
                     text = "“sizin için en uygun terapistler”",
                     modifier = Modifier.padding(top = 12.dp),
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = Color.Black
                 )
 
                 Button(
-                    onClick = { /* TODO */ },
+                    onClick = {
+                        navController.navigate("VideoScreenPage")
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF5F9E)),
                     shape = RoundedCornerShape(8.dp),
                     modifier = Modifier
@@ -300,7 +318,7 @@ fun FindATherapist() {
 }
 
 @Composable
-fun RecommendedTherapist() {
+fun RecommendedTherapist(authViewModel: AuthViewModel) {
     val rating = 4 // 0-5 arası puan
 
     Box(
@@ -316,6 +334,7 @@ fun RecommendedTherapist() {
             Text(
                 text = "Önerilenler",
                 fontSize = 24.sp,
+                color = Color.Black,
                 fontWeight = FontWeight.SemiBold
             )
 
@@ -341,7 +360,8 @@ fun RecommendedTherapist() {
                     Text(
                         text = "Psk. Mehmet Tutucu",
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black
                     )
 
                     Row(
@@ -360,7 +380,8 @@ fun RecommendedTherapist() {
                             text = "4.0",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(start = 4.dp)
+                            modifier = Modifier.padding(start = 4.dp),
+                            color = Color.Black
                         )
                     }
                 }
@@ -394,6 +415,7 @@ fun commentField(){
             Text("Yorumlar",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
+                color = Color.Black,
                 modifier = Modifier.padding(start = 16.dp, bottom = 8.dp))
 
             LazyColumn(
@@ -493,6 +515,7 @@ fun commentsRow(liste: listDay){
                   Row(verticalAlignment = Alignment.CenterVertically){
                       Text(text = "Ayşe Tanmaz",
                           fontSize = 10.sp,
+                          color = Color.Black,
                           fontWeight = FontWeight.SemiBold,
                           modifier = Modifier.padding(end = 5.dp))
 
@@ -507,6 +530,7 @@ fun commentsRow(liste: listDay){
                       Text(text = "3.0",
                           fontSize = 8.2.sp,
                           fontWeight = FontWeight.SemiBold,
+                          color = Color.Black,
                           modifier = Modifier.padding(start = 2.dp))
                   }
                   Text(text = "Lorem ipsum dolor sit amet consectetur. Dapibus nec eleifend nunc praesent sed. Malesuada massa integer.",

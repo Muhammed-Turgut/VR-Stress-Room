@@ -39,13 +39,14 @@ fun SplashScreenMain(modifier: Modifier=Modifier, navController: NavController, 
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFB3005E), // Başlangıç rengi
-                        Color(0xFF060047)  // Bitiş rengi
-                    )
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    Color(0xFFB3005E),
+                    Color(0xFF0A007A),
+                    Color(0xFFB3005E)
                 )
             )
+        )
     ) {
         Column(
             modifier = Modifier
@@ -54,20 +55,11 @@ fun SplashScreenMain(modifier: Modifier=Modifier, navController: NavController, 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(R.drawable.vrstresodasii),
+                painter = painterResource(R.drawable.logovr),
                 contentDescription = null,
-                modifier = Modifier.size(153.dp, 153.dp)
+                modifier = Modifier.size(320.dp, 368.dp)
             )
 
-            Text(
-                modifier = Modifier.padding(top = 16.dp),
-                textAlign = TextAlign.Center,
-                text = "VR Stres\nOdası",
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 40.sp,
-                lineHeight = 48.sp
-            )
         }
     }
 

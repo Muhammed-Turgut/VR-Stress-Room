@@ -4,6 +4,7 @@ package com.VrStressRoom.vrstressroom.CameraTestScreen
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
@@ -17,6 +18,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -25,20 +27,25 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.motionEventSpy
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -50,11 +57,9 @@ fun CameraScreen(navController: NavController) {
     val context = LocalContext.current
     val cameraViewModel: CameraViewModel = viewModel()
     val viewModel: CameraViewModel = viewModel()
-    val botYaniti by viewModel.aiResponse.collectAsState()
     val controller = remember { LifecycleCameraController(context) }
     val bitmaps by cameraViewModel.bitmaps.collectAsState()
 
-    println("bot yanıtı: ${botYaniti}")
 
     // Permission launcher
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -80,29 +85,33 @@ fun CameraScreen(navController: NavController) {
             controller = controller,
             context = context,
             viewModel = cameraViewModel,
-            bitmaps = bitmaps
+            bitmaps = bitmaps,
+            navController = navController
         )
     }
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun CameraScreenPage(
     controller: LifecycleCameraController,
     context: Context,
     viewModel: CameraViewModel,
+    navController: NavController,
     bitmaps: List<Bitmap>
 ) {
-    val scope = rememberCoroutineScope()
-    val scaffoldState = rememberBottomSheetScaffoldState()
+
     val botResponse by viewModel.aiResponse.collectAsState()
     val lastCapturedBitmap by viewModel.lastCapturedBitmap.collectAsState()
-
+    val aiResponse by viewModel.aiResponse.collectAsState()
+    var isLoading by remember { mutableStateOf(false) }
     val cabinBold = FontFamily(
         Font(R.font.cabinbold, FontWeight.Bold)
     )
+    BackHandler {
 
+    }
 
     Column(
         modifier = Modifier
@@ -116,12 +125,25 @@ fun CameraScreenPage(
                     )
                 )
             )
-            .padding(start = 8.dp, end = 8.dp, top = 110.dp, bottom = 50.dp),
+            .padding(start = 8.dp, end = 8.dp, top = 90.dp, bottom = 50.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Icon(
+            imageVector = Icons.Default.Close,
+            contentDescription = "Kapat",
+            tint = Color.White,
+            modifier = Modifier
+                .size(32.dp)
+                .clickable {
+                    navController.navigate("MainPage")
+                }
+                .align(Alignment.Start)
+                .padding(4.dp)
+                .zIndex(2f) // Yüksek z-index
+        )
 
-        Text(text = "Yüzünüzün Analizi Yapılıyor,${botResponse}",
+        Text(text = "Yüzünüzün Analizi Yapılıyor",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
@@ -133,30 +155,44 @@ fun CameraScreenPage(
         ) {
             if (lastCapturedBitmap != null) {
                 // Görüntü gösteriliyor
-                Box {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Kapat",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .size(32.dp)
+                            .clickable {
+                                viewModel.clearLastCapturedBitmap()
+                                isLoading=!isLoading
+                            }
+                            .padding(4.dp)
+                            .zIndex(2f) // Yüksek z-index
+                    )
 
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Kapat",
-                            tint = Color.White,
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(8.dp)
-                                .size(24.dp)
-                                .clickable {
-                                    viewModel.clearLastCapturedBitmap()
-                                }
-                        )
-                        Image(
-                            bitmap = lastCapturedBitmap!!.asImageBitmap(),
-                            contentDescription = "Çekilen Fotoğraf",
-                            modifier = Modifier
-                                .height(600.dp)
-                                .width(380.dp)
-                        )
-
-
+                    Image(
+                        bitmap = lastCapturedBitmap!!.asImageBitmap(),
+                        contentDescription = "Çekilen Fotoğraf",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .height(600.dp)
+                            .width(380.dp)
+                            .border(
+                                width = 2.dp,
+                                color = if (isLoading) Color.Green else Color.White,
+                                shape = RectangleShape
+                            )
+                            .zIndex(1f) // Daha düşük z-index
+                    )
                 }
+
+
 
             } else {
                 // Kamera aktif
@@ -224,6 +260,13 @@ fun CameraScreenPage(
                 }
                 val bitmap=lastCapturedBitmap //burda mantıken tür dönüşümü yaptık.
                 // Soldaki Check Icon (Varsa)
+
+                LaunchedEffect(aiResponse) {
+                    if (!aiResponse.isNullOrEmpty()) {
+                        isLoading=true
+                    }
+                }
+
                 if (bitmap != null) {
 
                     Box(
@@ -235,7 +278,12 @@ fun CameraScreenPage(
                             modifier = Modifier
                                 .size(45.dp)
                                 .clickable {
-                                  viewModel.onTakePhoto(bitmap)
+                                    viewModel.onTakePhoto(bitmap)
+                                    if (isLoading){
+                                        navController.navigate("AiQuizScreen")
+                                        viewModel.saveResponseToPreferences(context, response = aiResponse.toString())
+                                    }
+
                                 },
                             contentAlignment = Alignment.Center
                         ) {
@@ -263,11 +311,6 @@ fun CameraScreenPage(
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun displayCamera(){
 
-
-}
 
 

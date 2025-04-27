@@ -22,10 +22,12 @@ class VideoCallViewModel(
     fun onAction(action: VideoCallAction){
         when(action){
             VideoCallAction.JoinCall -> {
-
+                 joinCall()
             }
             VideoCallAction.OnDisconnectClick -> {
-
+               state.call.leave()
+                videoClient.logOut()
+                state = state.copy(callState =CallState.ENDED)
             }
         }
     }
@@ -39,11 +41,11 @@ class VideoCallViewModel(
             val sholudCreate = videoClient.queryCalls(filters = emptyMap())
                 .getOrNull()?.calls?.isEmpty() ==true
 
-            //Burda kaldım 40.39
 
             state.call.join(create = sholudCreate).onSuccess {
                 state = state.copy(callState = CallState.ACTIVE,
                     error = null)
+
             }.onError {
                 state = state.copy(
                     error = it.message,

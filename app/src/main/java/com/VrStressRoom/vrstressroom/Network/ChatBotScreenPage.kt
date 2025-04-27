@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -30,8 +31,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,63 +61,75 @@ fun ChatBotScreenPage(viewModel: ChatViewModel= viewModel(), navController: NavC
     val itemList by viewModel.itemListChatBot.collectAsState(initial = emptyList())
 
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ){
 
-        val isConnected by connectViewModel.isConnected
+        val isConnectedBot by connectViewModel.isConnected
 
         LaunchedEffect(Unit) {
             connectViewModel.checkConnection()
         }
 
-        if (isConnected) {
+        if (isConnectedBot) {
+
             BackHandler {
-                // Boş bırak -> hiçbir şey yapmaz geri tuşuna basıldığında geri gelmez.
+                // Geri tuşuna basıldığında hiçbir şey yapma
             }
+
+            Image(
+                painter = painterResource(R.drawable.vrstreslogoroom),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(width = 320.dp, height = 368.dp)
+                    .alpha(0.5f)
+                    .align(Alignment.Center), // SADECE Image'ı ortala!
+            )
 
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 80.dp)
-                    .background(Color.White), // Alt kısım boş kalır (input için)
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    .fillMaxSize()
+                    .padding(bottom = 80.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(modifier = Modifier
-
-                    .fillMaxWidth()
-                    .padding(top = 64.dp, start = 16.dp, end = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically){
-
-
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 64.dp, start = 16.dp, end = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     IconButton(
                         onClick = {
                             navController.navigate("MainPage")
-                        },
-                        modifier = Modifier.align(Alignment.Top)
+                        }
                     ) {
-                        Image(painter = painterResource(R.drawable.backchatboticon),
+                        Image(
+                            painter = painterResource(R.drawable.backchatboticon),
                             contentDescription = null,
-                            alignment = Alignment.TopCenter,
-                            modifier = Modifier.size(32.dp))
+                            modifier = Modifier.size(32.dp)
+                        )
                     }
 
-                    Text(modifier = Modifier.weight(1f),
+                    Text(
+                        modifier = Modifier.weight(1f),
                         text = "AI Chat Bot",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center
-
                     )
 
                     IconButton(
                         onClick = {
                             viewModel.deleteAllItem()
-                        },
-                        modifier = Modifier.align(Alignment.Top)
+                        }
                     ) {
-                        Image(painter = painterResource(R.drawable.trashiconbutton),
+                        Image(
+                            painter = painterResource(R.drawable.trashiconbutton),
                             contentDescription = null,
-                            alignment = Alignment.TopCenter,
-                            modifier = Modifier.size(32.dp))
+                            modifier = Modifier.size(32.dp)
+                        )
                     }
                 }
 
@@ -128,18 +143,19 @@ fun ChatBotScreenPage(viewModel: ChatViewModel= viewModel(), navController: NavC
                     reverseLayout = true
                 ) {
                     items(itemList) { message ->
-                        MessageBubble(sender = message.senderMessege?:"gelmedi", text = message.contentsMessage?: "gelmedi", dateTime = message.dateTime?:"00:00")
+                        MessageBubble(
+                            sender = message.senderMessege ?: "gelmedi",
+                            text = message.contentsMessage ?: "gelmedi",
+                            dateTime = message.dateTime ?: "00:00"
+                        )
                     }
                 }
 
-                // Alt input alanı
-                MessageInput(onMessageSend = {
-                    viewModel.sendMessageToBot(it)
-                }, saveItem = { item ->
-                    viewModel.saveItem(item)
-                }, dateTime = {
-                    viewModel.getCurrentTime()
-                })
+                MessageInput(
+                    onMessageSend = { viewModel.sendMessageToBot(it) },
+                    saveItem = { item -> viewModel.saveItem(item) },
+                    dateTime = { viewModel.getCurrentTime() }
+                )
             }
 
         } else {
@@ -152,7 +168,7 @@ fun ChatBotScreenPage(viewModel: ChatViewModel= viewModel(), navController: NavC
 
 
 
-@Composable
+    @Composable
 fun MessageInput(onMessageSend: (String) -> Unit,saveItem : (ItemChatBotList) -> Unit,dateTime : () -> String) {
     var message by remember { mutableStateOf("") }
 
@@ -247,13 +263,4 @@ fun MessageBubble(sender: String, text: String, dateTime: String) {
             }
         }
     }
-}
-
-
-
-
-@Preview(showBackground = true)
-@Composable
-fun display(){
-
 }

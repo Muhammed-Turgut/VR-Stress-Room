@@ -179,20 +179,6 @@ fun LoginScreen(modifier: Modifier = Modifier,
                     modifier = Modifier.padding(top = 12.dp)
                 )
 
-                /*Image(
-                    painter = painterResource(R.drawable.googlelogoicon),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(top = 32.dp)
-                        .size(54.dp, 54.dp)
-                )
-                Text(
-                    text = "veya",
-                    color = Color.White,
-                    modifier = Modifier.padding(top = 8.dp),
-                    fontSize = 13.sp
-                )*/
-
 
                 OutlinedTextField(
                     modifier = Modifier
@@ -254,9 +240,9 @@ fun LoginScreen(modifier: Modifier = Modifier,
 
 
                 Button(
-                            onClick = {
-                                authViewModel.login(email,password)
-                                 if(AuthState.Authenticated != null){
+                    onClick = {
+                        authViewModel.login(email,password)
+                           if(AuthState.Authenticated != null){
                                      navController.navigate("MainPage")
                                  }
                             },
@@ -270,9 +256,6 @@ fun LoginScreen(modifier: Modifier = Modifier,
                             Text(text = "Giriş Yap")
                         }
 
-
-
-
                 TextButton(onClick = {
                     navController.navigate("Signup")
                 }, modifier = Modifier.padding(top = 16.dp)) {
@@ -281,11 +264,4 @@ fun LoginScreen(modifier: Modifier = Modifier,
             }
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun dispalyLogin(){
-
 }

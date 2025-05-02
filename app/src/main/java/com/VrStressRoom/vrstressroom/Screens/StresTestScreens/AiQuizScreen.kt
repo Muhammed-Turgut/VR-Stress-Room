@@ -3,8 +3,12 @@ package com.VrStressRoom.vrstressroom.Screens.StresTestScreens
 
 
 import android.content.Context
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -14,6 +18,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +26,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,7 +35,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -37,12 +42,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Icon
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -54,6 +57,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -65,6 +70,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.VrStressRoom.vrstressroom.CameraTestScreen.CameraViewModel
 import com.VrStressRoom.vrstressroom.VideoCalling.Psychologists
 import com.VrStressRoom.vrstressroom.VideoCalling.psychologistsList
@@ -77,7 +83,6 @@ import kotlinx.coroutines.delay
 import kotlin.collections.listOf
 import com.VrStressRoom.vrstressroom.R
 import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.StrestPageNetwork.StressRequest
-import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.StrestPageNetwork.StressResponse
 import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.StrestPageNetwork.StressViewModel
 
 
@@ -86,6 +91,10 @@ fun AiQuizScreen(navController: NavController,
                  context: Context,
                  cameraViewModel: CameraViewModel,
                  stressApi:StressViewModel= viewModel()) {
+
+    BackHandler {
+        
+    }
 
     val sharedPreferences = context.getSharedPreferences("AI_PREFS", Context.MODE_PRIVATE)
     val aiResponse = sharedPreferences.getString("last_ai_response", null)
@@ -109,7 +118,7 @@ fun AiQuizScreen(navController: NavController,
             AiQuizPage(
                 ageString = age.toString(),
                 gender=gender.toString(),
-                emotion = emotion.toString(),stressApi=stressApi)
+                emotion = emotion.toString(),stressApi=stressApi,navController)
         }
 
 }
@@ -174,7 +183,7 @@ fun RelaxAnimationTwo() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AiQuizPage(ageString: String,gender:String,emotion:String,stressApi: StressViewModel) {
+fun AiQuizPage(ageString: String,gender:String,emotion:String,stressApi: StressViewModel,navController: NavController) {
     val list = remember { mutableStateOf(kidsTest) }
     val listUser = remember { mutableStateListOf<User>() } // Cevaplananlar burada
     val currentQuestionIndex = remember { mutableStateOf(0) } // Şu an hangi sorudayız
@@ -261,7 +270,7 @@ fun AiQuizPage(ageString: String,gender:String,emotion:String,stressApi: StressV
             }
 
             if (stressApi.isRequestCompleted) {
-                AiQuizFinishScreen(stressApi)
+                AiQuizFinishScreen(stressApi,navController)
             } else {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center)
@@ -273,7 +282,7 @@ fun AiQuizPage(ageString: String,gender:String,emotion:String,stressApi: StressV
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun AiQuizFinishScreen(stressApi: StressViewModel) {
+fun AiQuizFinishScreen(stressApi: StressViewModel,navController: NavController) {
 
     val cabinBold = FontFamily(
         Font(R.font.cabinbold, FontWeight.Bold)
@@ -320,7 +329,9 @@ fun AiQuizFinishScreen(stressApi: StressViewModel) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Button(
-                            onClick = { /* Geri dön işlevi buraya */ },
+                            onClick = {
+                                navController.navigate("MainPage")
+                            },
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                             contentPadding = PaddingValues(0.dp),
                             elevation = ButtonDefaults.buttonElevation(0.dp)
@@ -364,14 +375,6 @@ fun AiQuizFinishScreen(stressApi: StressViewModel) {
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
-                                Text(
-                                    text = response!!.advice,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    fontFamily = cabinRegular,
-                                    color = Color(0xFFFF5F9E),
-                                    lineHeight = 24.sp
-                                )
                             }
 
                             Spacer(modifier = Modifier.width(16.dp))
@@ -382,6 +385,9 @@ fun AiQuizFinishScreen(stressApi: StressViewModel) {
                             )
                         }
                     }
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    InfoCardWithBot(text = response!!.advice)
 
                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -458,120 +464,114 @@ fun AiQuizFinishScreen(stressApi: StressViewModel) {
                             .align(Alignment.Start)
                     )
 
-                    Row(
-                        modifier = Modifier
-                            .padding(start = 24.dp, top = 12.dp, end = 16.dp, bottom = 48.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
 
-                        Column {
-                            Text(
-                                text = "Nefes egzersizi \n" +
-                                        "yap ve rahatla",
-                                color = Color.White,
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier
-                            )
-
-                            Button(
-                                onClick = {
-                                    // Tıklama işlemi
-                                },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.White,
-                                    contentColor = Color.Black
-                                ),
-                                shape = RoundedCornerShape(12.dp), // Daha yuvarlak köşeler
-                                elevation = ButtonDefaults.buttonElevation(
-                                    defaultElevation = 6.dp, // Hafif gölge efekti
-                                    pressedElevation = 8.dp,
-                                    focusedElevation = 4.dp
-                                ),
-                                modifier = Modifier
-                                    .padding(top = 12.dp)
-                                    .height(48.dp) // Sabit yükseklik ama genişlik içerikle şekillenecek
-                                    .wrapContentWidth() // Genişlik yazıya göre ayarlanır
-                                    .defaultMinSize(minWidth = 120.dp), // Minimum genişlik garantisi
-                                contentPadding = PaddingValues(
-                                    horizontal = 16.dp,
-                                    vertical = 8.dp
-                                ) // İç boşluklar
-                            ) {
-                                Text(
-                                    text = "Başla",
-                                    color = Color.Black,
-                                    fontSize = 16.sp, // Yazı daha okunabilir
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-
-
-                        }
-
-
-                        Image(
-                            painter = painterResource(R.drawable.nefesegzersizi),
-                            contentDescription = null,
-                            modifier = Modifier.size(133.dp)
-                        )
-                    }
-
+                    nefesEgzersizleri()
+                    Spacer(modifier = Modifier.height(60.dp))
 
                 }
             }
         }
 }
+@Composable
+fun InfoCardWithBot(text: String) {
+    // görseli drawable'a koy: resmî adı "bot_icon.png" olsun
+    Box(
+        modifier = Modifier
+            .padding(16.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White)
+            .border(1.dp, Color.LightGray, RoundedCornerShape(12.dp))
+            .fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .padding(end = 80.dp) // sağ alt köşedeki robot için boşluk bırak
+        ) {
+            Text(
+                text = text,
+                fontSize = 16.sp,
+                color = Color.DarkGray
+            )
+        }
+
+        // Sağ alt köşedeki bot karakteri
+        Image(
+            painter = painterResource(R.drawable.maskotbot),
+            contentDescription = "Bot",
+            modifier = Modifier
+                .size(64.dp)
+                .align(Alignment.BottomEnd)
+                .padding(8.dp)
+        )
+    }
+}
 
 @Composable
 fun AiStressLevelIndicator(
     modifier: Modifier = Modifier,
-    stressLevel: Int, // 0 ile 100 arasında
+    stressLevel: Int, // 0 - 100 arasında
     maxLevel: Int = 100
 ) {
     val sweepAngle = (stressLevel / maxLevel.toFloat()) * 360f
-    val strokeWidth = 20f
+    val strokeWidth = with(LocalDensity.current) { 12.dp.toPx() } // Responsive kalınlık
+    val animatedStressLevel by animateFloatAsState(
+        targetValue = sweepAngle,
+        animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing)
+    )
 
     Box(
         modifier = modifier
-            .size(140.dp)
-            .padding(16.dp),
+            .aspectRatio(1f) // Her zaman kare kalsın
+            .padding(8.dp),
         contentAlignment = Alignment.Center
     ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            // Arka plan çemberi (gri)
+            // Arka plan dairesi (soft gri)
             drawArc(
-                color = Color.White,
+                color = Color.LightGray.copy(alpha = 0.3f),
                 startAngle = -90f,
                 sweepAngle = 360f,
                 useCenter = false,
                 style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
             )
 
-            // Öndeki çember (stres seviyesi kadar)
+            // Öndeki seviye dairesi
             drawArc(
-                color = if (stressLevel < 40) Color.Green else if (stressLevel < 70) Color.Yellow else Color(0xFFFF5F9E),
+                color = when {
+                    stressLevel < 40 -> Color(0xFF4CAF50) // Yeşil
+                    stressLevel < 70 -> Color(0xFFFFC107) // Sarı
+                    else -> Color(0xFFFF5F9E)             // Pembe
+                },
                 startAngle = -90f,
-                sweepAngle = sweepAngle,
+                sweepAngle = animatedStressLevel, // Animasyonlu gösterim
                 useCenter = false,
                 style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
             )
         }
 
-        // Ortadaki metin
-        Column(horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center) {
+        // Ortadaki içerik
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
             Text(
                 text = "$stressLevel%",
-                fontSize = 32.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
-
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = if (stressLevel < 40) "Rahat" else if (stressLevel < 70) "Orta" else "Stresli",
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color.Gray
+            )
         }
     }
 }
+
 
 @Composable
 fun RecommendedActivePsychologistsRow(
@@ -656,6 +656,75 @@ fun RecommendedActivePsychologistsRow(
         }
     }
 }
+
+
+@Composable
+fun nefesEgzersizleri(){
+    Row(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp)) // Daha yumuşak köşeler
+            .background(Color.White)
+            .padding(16.dp), // İç boşluk
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween // Boşlukları daha dengeli dağıtır
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f) // İçeriğin fazla yer kaplamasını sağlar
+                .padding(end = 12.dp) // Image'den biraz uzak durur
+        ) {
+            Text(
+                text = "Nefes Egzersizi\nYap ve Rahatla",
+                color = Color.Black,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 30.sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Nefes egzersizleri, stresi azaltıp\n" +
+                        "zihni sakinleştirerek bedenin doğal\n" +
+                        "dengesini korumaya yardımcı olur.",
+                color = Color.Gray,
+                fontSize = 14.sp,
+                lineHeight = 20.sp
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { /* TODO */ },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFFF5F9E),
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 4.dp
+                ),
+                modifier = Modifier
+                    .height(48.dp)
+                    .defaultMinSize(minWidth = 140.dp)
+            ) {
+                Text(
+                    text = "Başla",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+        Image(
+            painter = painterResource(id = R.drawable.nefesegzersizi),
+            contentDescription = "Nefes Egzersizi",
+            contentScale = ContentScale.Crop, // Daha iyi görüntü oturması için
+            modifier = Modifier
+                .size(120.dp) // Biraz daha küçük, tasarıma uyumlu
+                .clip(RoundedCornerShape(12.dp)) // Hafif arka plan opsiyonel
+        )
+    }
+
+} //Burası nefes egzersiz bölümü.
+
 
 val kidsTest = listOf(
     Test("Okul değişikliği yaptın mı?", false),
@@ -796,14 +865,11 @@ fun CustomButton(
 @Preview(showBackground = true)
 @Composable
 fun mains(){
+    val stressApi:StressViewModel=viewModel()
+    val navController = rememberNavController()
 
+    AiQuizFinishScreen(stressApi = stressApi, navController = navController)
 }
-
-
-
-
-
-
 
 
 data class Test(val name:String,val reply: Boolean)

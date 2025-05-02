@@ -66,6 +66,7 @@ fun ConnectScreen(
             Text(text = "Psikologlar",
                 modifier = Modifier.padding(top = 16.dp),
                 fontSize = 24.sp,
+                color = Color.Black,
                 fontWeight = FontWeight.SemiBold)
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -88,6 +89,7 @@ fun ConnectScreen(
             Text(text = "Aktif Psikologlar",
                 modifier = Modifier.padding(top = 16.dp),
                 fontSize = 18.sp,
+                color = Color.Black,
                 fontWeight = FontWeight.SemiBold)
 
             LazyRow(
@@ -104,6 +106,7 @@ fun ConnectScreen(
             Text(text = "Randevulu Psikologlar",
                 modifier = Modifier.padding(top = 16.dp),
                 fontSize = 18.sp,
+                color = Color.Black,
                 fontWeight = FontWeight.SemiBold)
 
             LazyColumn( modifier = Modifier
@@ -156,6 +159,7 @@ fun ActivePsychologistsRow(
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold,
             lineHeight = 18.sp,
+            color = Color.Black,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -177,6 +181,7 @@ fun ActivePsychologistsRow(
                 text = "${item.rating},0",
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Medium,
+                color = Color.Black,
                 modifier = Modifier.padding(start = 4.dp)
             )
         }
@@ -230,6 +235,7 @@ fun AppointmentPsychologistsRow(item: Psychologists,state: ConnectState,
                 text = "Psk. "+"${item.namePsychologists}",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
+                color = Color.Black,
                 lineHeight = 10.sp
             )
 
@@ -249,6 +255,7 @@ fun AppointmentPsychologistsRow(item: Psychologists,state: ConnectState,
                 Text(
                     text = "${item.rating}.0",
                     fontSize = 10.sp,
+                    color = Color.Black,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(start = 4.dp)
                 )

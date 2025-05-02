@@ -100,6 +100,9 @@ dependencies {
 
     //Bu Lottie files kütüphanesi.
     implementation("com.airbnb.android:lottie-compose:6.0.0")
+    implementation("app.rive:rive-android:9.6.5")
+    implementation("androidx.startup:startup-runtime:1.1.1")
+
 
     val room_version = "2.7.0"
     ksp("androidx.room:room-compiler:$room_version")
@@ -125,6 +128,9 @@ dependencies {
 
     //Bu sayafalar arasındaki geçişler için kullnadım.
     implementation ("com.google.accompanist:accompanist-pager:0.28.0")
+
+    implementation ("androidx.compose.runtime:runtime-livedata:<compose_version>")
+
 
     //Bu kod görntülü görüşme için eklendi
     implementation(libs.bundles.koin)

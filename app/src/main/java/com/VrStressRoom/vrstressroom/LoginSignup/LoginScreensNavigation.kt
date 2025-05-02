@@ -17,6 +17,7 @@ import com.VrStressRoom.vrstressroom.Network.ChatViewModel
 import com.VrStressRoom.vrstressroom.Screens.MainPage
 import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.AIQuizStartScreen
 import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.AiQuizScreen
+import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.BreathingExerciseScreen
 import com.VrStressRoom.vrstressroom.Screens.StresTestScreens.StresTestStartScreen
 import com.VrStressRoom.vrstressroom.VideoCalling.VideoScreenPage
 
@@ -63,6 +64,12 @@ fun LoginScreenNavigation(modifier: Modifier=Modifier, authViewModel: AuthViewMo
         composable("AıChatBot"){
             ChatBotScreenPage(navController=navController)
         }
+
+        composable("BreathingExerciseScreen"){
+            BreathingExerciseScreen(navController=navController,context)
+        }
+
+
 
     })
 }

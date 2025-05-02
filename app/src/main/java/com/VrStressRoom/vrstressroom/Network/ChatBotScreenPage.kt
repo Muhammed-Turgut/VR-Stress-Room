@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
@@ -51,33 +52,22 @@ import com.VrStressRoom.vrstressroom.Screens.HomeScreenHeader
 
 
 @Composable
-fun ChatBotScreenPage(viewModel: ChatViewModel= viewModel(), navController: NavController,connectViewModel: ConnectivityViewModel = viewModel()) {
-
-
+fun ChatBotScreenPage(viewModel: ChatViewModel= viewModel(), navController: NavController) {
     //Önceden göderilen mesajlaarın listelendiği kısım.
     LaunchedEffect(Unit) {
         viewModel.getItemList()
     }
     val itemList by viewModel.itemListChatBot.collectAsState(initial = emptyList())
 
+    BackHandler {
+        // Geri tuşuna basıldığında hiçbir şey yapma
+    }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ){
-
-        val isConnectedBot by connectViewModel.isConnected
-
-        LaunchedEffect(Unit) {
-            connectViewModel.checkConnection()
-        }
-
-        if (isConnectedBot) {
-
-            BackHandler {
-                // Geri tuşuna basıldığında hiçbir şey yapma
-            }
 
             Image(
                 painter = painterResource(R.drawable.vrstreslogoroom),
@@ -91,14 +81,17 @@ fun ChatBotScreenPage(viewModel: ChatViewModel= viewModel(), navController: NavC
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 80.dp),
+                    .padding(bottom = 50.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 64.dp, start = 16.dp, end = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(start = 16.dp, end = 16.dp, top = 30.dp)
+                        .clip(CircleShape)
+                        .background( Color(0xFFFF5F9E)),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
                     IconButton(
                         onClick = {
@@ -113,9 +106,12 @@ fun ChatBotScreenPage(viewModel: ChatViewModel= viewModel(), navController: NavC
                     }
 
                     Text(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(top = 10.dp, bottom = 10.dp),
                         text = "AI Chat Bot",
                         fontSize = 24.sp,
+                        color = Color.White,
                         fontWeight = FontWeight.SemiBold,
                         textAlign = TextAlign.Center
                     )
@@ -157,12 +153,6 @@ fun ChatBotScreenPage(viewModel: ChatViewModel= viewModel(), navController: NavC
                     dateTime = { viewModel.getCurrentTime() }
                 )
             }
-
-        } else {
-            NoInternetScreen(onRetry = {
-                connectViewModel.checkConnection()
-            })
-        }
     }
 }
 

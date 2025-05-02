@@ -60,6 +60,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.navigation.NavController
+import com.VrStressRoom.vrstressroom.LoginSignup.AuthState
 import com.VrStressRoom.vrstressroom.LoginSignup.AuthViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -76,36 +77,30 @@ fun HomeScreen(viewModel: ConnectivityViewModel = viewModel(),navController: Nav
             viewModel.checkConnection()
         }
 
-        if (isConnected) {
-            Box(modifier = Modifier.fillMaxSize()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    // Header (Sabit bölüm)
-                    HomeScreenHeader(authViewModel)
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                // Header (Sabit bölüm)
+                HomeScreenHeader(authViewModel)
 
-                    // Dikey kaydırılabilir alan
-                    CompositionLocalProvider(
-                        LocalOverscrollConfiguration provides null // Overscroll efektini kaldır bu scrool edince sınırlarda oluşan gri efekti kapatrı.
+                // Dikey kaydırılabilir alan
+                CompositionLocalProvider(
+                    LocalOverscrollConfiguration provides null // Overscroll efektini kaldır bu scrool edince sınırlarda oluşan gri efekti kapatrı.
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()) // Kaydırma etkisi
                     ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(rememberScrollState()) // Kaydırma etkisi
-                        ) {
-                            lastTest()
-                            FindATherapist(navController)
-                            RecommendedTherapist(authViewModel)
-                            commentField()
-                        }
+                        lastTest()
+                        FindATherapist(navController)
+                        RecommendedTherapist(authViewModel)
+                        commentField()
                     }
                 }
             }
-        } else {
-            NoInternetScreen(onRetry = {
-                viewModel.checkConnection()
-            })
         }
     }
 }
@@ -113,9 +108,18 @@ fun HomeScreen(viewModel: ConnectivityViewModel = viewModel(),navController: Nav
 @Composable
 fun HomeScreenHeader(authViewModel: AuthViewModel) {
     val userInfo by authViewModel.userInfo.observeAsState()
+    val authState by authViewModel.authState.observeAsState()
 
     LaunchedEffect(Unit) {
         authViewModel.getAuthUserInformation()
+    }
+
+    if (authState is AuthState.Error) {
+        Text(
+            text = (authState as AuthState.Error).message,
+            color = Color.Red,
+            modifier = Modifier.padding(16.dp)
+        )
     }
 
     userInfo?.let { user ->
@@ -139,12 +143,11 @@ fun HomeScreenHeader(authViewModel: AuthViewModel) {
                     .padding(top = 8.dp, bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Profil Fotoğrafı
                 Image(
                     painter = painterResource(R.drawable.userimage),
                     contentDescription = null,
                     modifier = Modifier
-                        .padding(start = 8.dp) // En sola boşluk bırakır
+                        .padding(start = 8.dp)
                         .size(48.dp)
                         .clip(CircleShape)
                         .border(2.dp, Color.White, CircleShape)
@@ -163,18 +166,17 @@ fun HomeScreenHeader(authViewModel: AuthViewModel) {
                         color = Color.White,
                         lineHeight = 4.sp
                     )
-                    Spacer(modifier = Modifier.height(2.dp)) // Boşluğu azaltmak için 4.dp
+                    Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "${user.name} ${user.lastname}",
                         fontWeight = FontWeight.SemiBold,
                         fontStyle = FontStyle.Normal,
                         fontSize = 14.sp,
                         color = Color.White,
-                        lineHeight = 4.sp //satır yüksekliği
+                        lineHeight = 4.sp
                     )
                 }
 
-                // Bildirim İkonu
                 Image(
                     painter = painterResource(R.drawable.belliconbutton),
                     contentDescription = null,
@@ -186,6 +188,7 @@ fun HomeScreenHeader(authViewModel: AuthViewModel) {
         }
     }
 }
+
 
 @Composable
 fun lastTest(){
